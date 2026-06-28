@@ -13,16 +13,16 @@ export default function HomePage() {
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
               <Sparkles className="w-3 h-3 text-indigo-500" />
-              <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">AI-Powered HR Platform</span>
+              <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">AI-Powered Candidate Intelligence</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-black text-gray-950 leading-[1.05] tracking-tight mb-5">
-              Hire smarter.<br />
-              <span className="text-indigo-600">Lead better.</span>
+              Hire smarter,<br />
+              <span className="text-indigo-600">Screen faster.</span>
             </h1>
 
             <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-xl mb-8">
-              AI resume screening, live workforce tracking, and intelligent HR management — engineered for teams that move fast.
+              AI-powered candidate screening and interview intelligence — built for recruiters who need to make faster, smarter hiring decisions.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -70,7 +70,7 @@ export default function HomePage() {
         </div>
 
         <p className="mt-6 text-center text-[10px] text-gray-300 font-medium tracking-wide">
-          SmartHR v2.0 · Next.js 15 · TypeScript · Prisma · Supabase · Gemini 2.0
+          HireIQ v2.0 · Next.js 15 · TypeScript · Prisma · Supabase · Gemini 2.0
         </p>
       </div>
     </div>

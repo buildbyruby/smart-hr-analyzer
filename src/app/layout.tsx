@@ -7,8 +7,8 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'SmartHR — AI Workspace',
-  description: 'AI-powered HR management, resume analysis, and workforce tracking.',
+  title: 'HireIQ — AI Workspace',
+  description: 'AI-powered candidate screening, ATS scoring, and interview intelligence for modern recruiters.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

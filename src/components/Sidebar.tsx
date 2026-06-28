@@ -27,7 +27,7 @@ export default function Sidebar() {
           <div className="w-6 h-6 rounded-lg bg-indigo-600 flex items-center justify-center">
             <Sparkles className="w-3 h-3 text-white" />
           </div>
-          <span className="font-black text-gray-900 text-sm">SmartHR</span>
+          <span className="font-black text-gray-900 text-sm">HireIQ</span>
         </div>
       </div>
 
@@ -49,8 +49,8 @@ export default function Sidebar() {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="font-black text-gray-950 text-sm leading-none">SmartHR</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">AI Workspace</p>
+              <p className="font-black text-gray-950 text-sm leading-none">HireIQ</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">Candidate Intelligence</p>
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="md:hidden p-1.5 rounded-lg hover:bg-gray-100">

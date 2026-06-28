@@ -1,6 +1,6 @@
-# SmartHR — AI-Powered Recruitment & Workforce Management
+# HireIQ — AI-Powered Candidate Intelligence Platform
 
-SmartHR is a full-stack HR platform that screens resumes using AI and manages a live employee directory.
+HireIQ is a full-stack AI recruitment intelligence platform that screens resumes using AI and manages a live employee directory.
 
 ## What it does
 
