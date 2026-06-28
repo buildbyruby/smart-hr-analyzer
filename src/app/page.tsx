@@ -5,29 +5,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 p-5 md:p-8 lg:p-10">
       <div className="max-w-4xl mx-auto">
-
         <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 md:p-12 mb-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-indigo-50 to-transparent rounded-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-violet-50 to-transparent pointer-events-none" />
-
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
               <Sparkles className="w-3 h-3 text-indigo-500" />
               <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">AI-Powered Candidate Intelligence</span>
             </div>
-
             <h1 className="text-4xl md:text-6xl font-black text-gray-950 leading-[1.05] tracking-tight mb-5">
               Hire smarter,<br />
               <span className="text-indigo-600">Screen faster.</span>
             </h1>
-
             <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-xl mb-8">
               AI-powered candidate screening and interview intelligence — built for recruiters who need to make faster, smarter hiring decisions.
             </p>
-
             <div className="flex flex-wrap gap-3">
               {[
-                { icon: Zap, label: 'Gemini 2.0 Flash', sub: 'AI Engine' },
+                { icon: Zap, label: 'Groq · Llama 3.3', sub: 'AI Engine' },
                 { icon: Shield, label: 'Supabase', sub: 'PostgreSQL DB' },
                 { icon: Activity, label: 'Next.js 15', sub: 'App Router' },
               ].map(({ icon: Icon, label, sub }) => (
@@ -45,9 +40,39 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { href: '/analysis', icon: FileSearch, title: 'Resume Analysis', description: 'AI-powered ATS scoring. Upload any PDF and match it against a job description in seconds.', tag: 'Gemini AI', color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', tagColor: 'text-indigo-500' },
-            { href: '/dashboard', icon: Users, title: 'Candidate Directory', description: 'Live employee directory. Track attendance and monitor your workforce in real time.', tag: 'Live', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', tagColor: 'text-emerald-500' },
-            { href: '/manage', icon: LayoutGrid, title: 'Job & Team Records', description: 'Create job postings and onboard employees. Every record syncs instantly to Supabase.', tag: 'Supabase', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100', tagColor: 'text-violet-500' },
+            {
+              href: '/analysis',
+              icon: FileSearch,
+              title: 'Candidate Intelligence',
+              description: 'Upload any resume PDF and get an instant ATS score, candidate summary, strengths and weaknesses — then generate tailored interview questions with a 1-10 scoring guide.',
+              tag: 'Core Feature',
+              color: 'text-indigo-600',
+              bg: 'bg-indigo-50',
+              border: 'border-indigo-100',
+              tagColor: 'text-indigo-500',
+            },
+            {
+              href: '/dashboard',
+              icon: Users,
+              title: 'Pipeline Directory',
+              description: 'Track every candidate in your hiring pipeline. Mark them active or inactive, edit their details, and search across your full candidate pool in real time.',
+              tag: 'Live',
+              color: 'text-emerald-600',
+              bg: 'bg-emerald-50',
+              border: 'border-emerald-100',
+              tagColor: 'text-emerald-500',
+            },
+            {
+              href: '/manage',
+              icon: LayoutGrid,
+              title: 'Manage Records',
+              description: 'Create detailed job postings that power AI screening. Add candidates to your pipeline with full contact records synced instantly to Supabase.',
+              tag: 'Supabase',
+              color: 'text-violet-600',
+              bg: 'bg-violet-50',
+              border: 'border-violet-100',
+              tagColor: 'text-violet-500',
+            },
           ].map(({ href, icon: Icon, title, description, tag, color, bg, border, tagColor }) => (
             <Link key={href} href={href}
               className="group bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 hover:-translate-y-0.5 flex flex-col">
@@ -70,7 +95,7 @@ export default function HomePage() {
         </div>
 
         <p className="mt-6 text-center text-[10px] text-gray-300 font-medium tracking-wide">
-          HireIQ v2.0 · Next.js 15 · TypeScript · Prisma · Supabase · Gemini 2.0
+          HireIQ v1.0 · Next.js 15 · TypeScript · Prisma · Supabase · Groq Llama 3.3
         </p>
       </div>
     </div>

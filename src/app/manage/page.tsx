@@ -31,13 +31,13 @@ export default function ManagePage() {
     } catch (e: any) { toast.error(e.message) } finally { setJobLoading(false) }
   }
 
-  const handleEmpSubmit = async (e: React.FormEvent) => {
+  const handleCandidateSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); if (!firstName.trim() || !lastName.trim() || !email.trim()) return
     setEmpLoading(true)
     try {
       const res = await fetch('/api/employees', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ firstName, lastName, email, phone }) })
       const data = await res.json(); if (!res.ok) throw new Error(data.error)
-      toast.success(`${data.firstName} ${data.lastName} onboarded`); setFirstName(''); setLastName(''); setEmail(''); setPhone(''); setEmpCount(p => (p ?? 0) + 1)
+      toast.success(`${data.firstName} ${data.lastName} added to pipeline`); setFirstName(''); setLastName(''); setEmail(''); setPhone(''); setEmpCount(p => (p ?? 0) + 1)
     } catch (e: any) { toast.error(e.message) } finally { setEmpLoading(false) }
   }
 
@@ -51,13 +51,13 @@ export default function ManagePage() {
             <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />Records
           </span>
           <h1 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-none">Manage Records</h1>
-          <p className="text-gray-400 mt-2 text-sm">Create job postings and onboard employees. All data syncs live to Supabase.</p>
+          <p className="text-gray-400 mt-2 text-sm">Create job postings and add candidates to your pipeline. All data syncs live to Supabase.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
           {[
             { label: 'Job Postings', value: jobCount, icon: Briefcase, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
-            { label: 'Employees', value: empCount, icon: UserPlus, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+            { label: 'Candidates', value: empCount, icon: UserPlus, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
           ].map(({ label, value, icon: Icon, color, bg, border }) => (
             <div key={label} className={`bg-white rounded-2xl border ${border} p-5 shadow-sm flex items-center gap-4`}>
               <div className={`w-11 h-11 rounded-2xl ${bg} border ${border} flex items-center justify-center shrink-0`}>
@@ -79,7 +79,7 @@ export default function ManagePage() {
               </div>
               <div>
                 <h2 className="text-sm font-black text-gray-900">New Job Posting</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Used as the base for AI resume analysis</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">Used as the base for AI candidate screening</p>
               </div>
             </div>
             <form onSubmit={handleJobSubmit} className="space-y-4">
@@ -89,7 +89,7 @@ export default function ManagePage() {
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Job Description *</label>
-                <textarea rows={6} placeholder="Describe the role, responsibilities, required skills and qualifications. More detail = better AI analysis." value={jobDesc} onChange={e => setJobDesc(e.target.value)} className={`${input} resize-none leading-relaxed`} />
+                <textarea rows={6} placeholder="Describe the role, responsibilities, required skills and qualifications. More detail = better AI screening." value={jobDesc} onChange={e => setJobDesc(e.target.value)} className={`${input} resize-none leading-relaxed`} />
               </div>
               <button type="submit" disabled={jobLoading || !jobTitle.trim() || !jobDesc.trim()}
                 className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-black hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-100 active:scale-[0.98] flex items-center justify-center gap-2">
@@ -104,11 +104,11 @@ export default function ManagePage() {
                 <UserPlus className="w-4 h-4 text-violet-600" />
               </div>
               <div>
-                <h2 className="text-sm font-black text-gray-900">Onboard Employee</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Add a new team member to the system</p>
+                <h2 className="text-sm font-black text-gray-900">Add Candidate</h2>
+                <p className="text-[10px] text-gray-400 mt-0.5">Add a new candidate to your hiring pipeline</p>
               </div>
             </div>
-            <form onSubmit={handleEmpSubmit} className="space-y-4">
+            <form onSubmit={handleCandidateSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">First Name *</label>
@@ -120,20 +120,20 @@ export default function ManagePage() {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Work Email *</label>
-                <input type="email" placeholder="jane.doe@company.com" value={email} onChange={e => setEmail(e.target.value)} className={input} />
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Email Address *</label>
+                <input type="email" placeholder="jane.doe@email.com" value={email} onChange={e => setEmail(e.target.value)} className={input} />
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
                 <input type="tel" placeholder="+254 700 000 000" value={phone} onChange={e => setPhone(e.target.value)} className={input} />
               </div>
               <div className="p-4 rounded-xl bg-slate-50 border border-gray-100">
-                <p className="text-[10px] font-bold text-gray-400 mb-1">After onboarding</p>
-                <p className="text-xs text-gray-500 leading-relaxed">Employee will appear in the HR Dashboard for attendance tracking.</p>
+                <p className="text-[10px] font-bold text-gray-400 mb-1">After adding</p>
+                <p className="text-xs text-gray-500 leading-relaxed">Candidate will appear in the Pipeline Directory where you can track their screening and hiring status.</p>
               </div>
               <button type="submit" disabled={empLoading || !firstName.trim() || !lastName.trim() || !email.trim()}
                 className="w-full py-3.5 rounded-xl bg-gray-950 text-white text-sm font-black hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-gray-200 active:scale-[0.98] flex items-center justify-center gap-2">
-                {empLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Onboarding...</> : '+ Onboard Employee'}
+                {empLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Adding...</> : '+ Add Candidate'}
               </button>
             </form>
           </div>

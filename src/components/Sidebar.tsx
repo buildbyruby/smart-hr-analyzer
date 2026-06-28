@@ -7,7 +7,7 @@ import { FileSearch, Users, LayoutGrid, Home, Menu, X, Sparkles } from 'lucide-r
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/analysis', label: 'Resume Analysis', icon: FileSearch },
+  { href: '/analysis', label: 'Candidate Intelligence', icon: FileSearch },
   { href: '/dashboard', label: 'Pipeline Directory', icon: Users },
   { href: '/manage', label: 'Manage Records', icon: LayoutGrid },
 ]
@@ -78,7 +78,7 @@ export default function Sidebar() {
             <div className="w-2 h-2 rounded-full bg-green-400 shrink-0 mt-0.5 animate-pulse" />
             <div>
               <p className="text-xs font-bold text-gray-700 leading-none">All systems online</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">Supabase · Gemini 2.0</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">Supabase · Groq Llama 3.3</p>
             </div>
           </div>
         </div>
