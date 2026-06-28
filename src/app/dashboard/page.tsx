@@ -145,7 +145,7 @@ export default function DashboardPage() {
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Live Data
             </span>
-            <h1 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-none">HR Dashboard</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-none">Candidate Directory</h1>
             <p className="text-gray-400 mt-2 text-sm">Real-time workforce overview and attendance management.</p>
           </div>
           <button onClick={() => fetchEmployees(true)}

@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Upload, FileText, Briefcase, CheckCircle, AlertCircle, Lightbulb, Loader2, RotateCcw, ChevronDown } from 'lucide-react'
+import { Upload, FileText, Briefcase, CheckCircle, AlertCircle, Lightbulb, Loader2, RotateCcw, ChevronDown, MessageSquare, Brain, Target } from 'lucide-react'
 import { toast } from 'sonner'
 
-interface Job { id: number; title: string }
+interface Job { id: number; title: string; description: string }
 interface AnalysisResult { score: number; summary: string; strengths: string[]; weaknesses: string[]; suggestions: string[] }
+interface InterviewQuestion { type: string; question: string; purpose: string }
+interface InterviewResult { questions: InterviewQuestion[] }
 
 function ScoreRing({ score }: { score: number }) {
   const [display, setDisplay] = useState(0)
@@ -38,9 +40,9 @@ function ScoreRing({ score }: { score: number }) {
         </div>
       </div>
       <div>
-        <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color }}>ATS Score</p>
+        <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color }}>Candidate Score</p>
         <p className="text-xl font-black text-gray-900 leading-tight">{label}</p>
-        <p className="text-xs text-gray-500 mt-1">Based on keyword match &amp; role alignment</p>
+        <p className="text-xs text-gray-500 mt-1">Based on keyword match & role alignment</p>
       </div>
     </div>
   )
@@ -51,7 +53,43 @@ function Skeleton() {
     <div className="space-y-4">
       <div className="h-28 rounded-2xl skeleton" />
       <div className="h-20 rounded-2xl skeleton" />
-      <div className="grid grid-cols-3 gap-3"><div className="h-32 rounded-xl skeleton" /><div className="h-32 rounded-xl skeleton" /><div className="h-32 rounded-xl skeleton" /></div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="h-32 rounded-xl skeleton" />
+        <div className="h-32 rounded-xl skeleton" />
+        <div className="h-32 rounded-xl skeleton" />
+      </div>
+    </div>
+  )
+}
+
+function InterviewPanel({ questions }: { questions: InterviewQuestion[] }) {
+  const typeColors: Record<string, string> = {
+    Technical: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+    Behavioral: 'bg-violet-50 text-violet-700 border-violet-100',
+    Situational: 'bg-amber-50 text-amber-700 border-amber-100',
+  }
+
+  return (
+    <div className="space-y-3 animate-fade-in">
+      <div className="flex items-center gap-2 mb-4">
+        <Brain className="w-4 h-4 text-indigo-500" />
+        <p className="text-sm font-black text-gray-900">AI-Generated Interview Questions</p>
+      </div>
+      {questions.map((q, i) => (
+        <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${typeColors[q.type] || 'bg-gray-50 text-gray-600 border-gray-100'}`}>
+              {q.type}
+            </span>
+            <span className="text-[9px] text-gray-300 font-medium shrink-0">Q{i + 1}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-800 mb-2 leading-relaxed">{q.question}</p>
+          <div className="flex items-start gap-1.5">
+            <Target className="w-3 h-3 text-gray-300 shrink-0 mt-0.5" />
+            <p className="text-[10px] text-gray-400 leading-relaxed">{q.purpose}</p>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -64,16 +102,21 @@ export default function AnalysisPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [interviewResult, setInterviewResult] = useState<InterviewResult | null>(null)
+  const [showInterview, setShowInterview] = useState(false)
 
   useEffect(() => {
     fetch('/api/jobs').then(r => r.json()).then(d => { setJobs(d); if (d.length > 0) setSelectedJobId(d[0].id) })
       .catch(() => toast.error('Failed to load jobs'))
   }, [])
 
+  const selectedJob = jobs.find(j => j.id === selectedJobId)
+
   const handleFile = useCallback(async (file: File) => {
     if (file.type !== 'application/pdf') { toast.error('PDF files only'); return }
-    setIsUploading(true); setResumeText(''); setResult(null)
+    setIsUploading(true); setResumeText(''); setResult(null); setInterviewResult(null); setShowInterview(false)
     const fd = new FormData(); fd.append('file', file)
     try {
       const res = await fetch('/api/resumes/upload', { method: 'POST', body: fd })
@@ -87,7 +130,7 @@ export default function AnalysisPage() {
 
   const handleAnalyze = async () => {
     if (!resumeText || !selectedJobId) return
-    setIsAnalyzing(true); setResult(null)
+    setIsAnalyzing(true); setResult(null); setInterviewResult(null); setShowInterview(false)
     try {
       const res = await fetch('/api/resumes/analyze', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -95,9 +138,31 @@ export default function AnalysisPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      setResult(data); toast.success(`Score: ${data.score}/100`)
+      setResult(data); toast.success(`Score: ${data.score}/100 — Analysis complete`)
     } catch (e: any) { toast.error(e.message || 'Analysis failed') }
     finally { setIsAnalyzing(false) }
+  }
+
+  const handleGenerateQuestions = async () => {
+    if (!result || !selectedJob) return
+    setIsGeneratingQuestions(true); setShowInterview(true); setInterviewResult(null)
+    try {
+      const res = await fetch('/api/interview', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeText,
+          jobTitle: selectedJob.title,
+          jobDescription: selectedJob.description,
+          score: result.score,
+          weaknesses: result.weaknesses,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setInterviewResult(data)
+      toast.success('8 interview questions generated')
+    } catch (e: any) { toast.error(e.message || 'Failed to generate questions') }
+    finally { setIsGeneratingQuestions(false) }
   }
 
   return (
@@ -105,29 +170,27 @@ export default function AnalysisPage() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />Gemini 2.0 Flash
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />Groq · Llama 3.3
           </span>
-          <h1 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-none">Resume Analysis</h1>
-          <p className="text-gray-400 mt-2 text-sm">Upload any PDF — get instant AI scoring against your job description.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-none">Candidate Intelligence</h1>
+          <p className="text-gray-400 mt-2 text-sm">Upload any PDF resume — get instant AI scoring and tailored interview questions.</p>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-5">
           <div className="flex flex-col gap-4">
-
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Target Job Position</label>
               <div className="relative">
-                <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" style={{zIndex:2}} />
+                <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" />
                 <select value={selectedJobId ?? ''} onChange={e => setSelectedJobId(Number(e.target.value))}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-slate-50 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition-all appearance-none cursor-pointer relative"
-                  style={{position:'relative', zIndex:1}}>
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-slate-50 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition-all appearance-none cursor-pointer">
                   {jobs.length === 0
                     ? <option disabled value="">No jobs — add one in Manage Records</option>
                     : jobs.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
                 </select>
-                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" style={{zIndex:2}} />
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
-              {jobs.length > 0 && <p className="mt-2 text-[10px] text-gray-400">{jobs.length} job{jobs.length !== 1 ? 's' : ''} available</p>}
+              {jobs.length > 0 && <p className="mt-2 text-[10px] text-gray-400">{jobs.length} position{jobs.length !== 1 ? 's' : ''} available</p>}
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
@@ -168,12 +231,21 @@ export default function AnalysisPage() {
                 {isAnalyzing ? <><Loader2 className="w-4 h-4 animate-spin" />Analyzing...</> : '✦ Run AI Analysis'}
               </button>
               {result && (
-                <button onClick={() => { setResult(null); setResumeText(''); setFileName('') }}
+                <button onClick={() => { setResult(null); setResumeText(''); setFileName(''); setInterviewResult(null); setShowInterview(false) }}
                   className="p-3.5 rounded-xl border border-gray-200 hover:bg-gray-100 text-gray-400 transition-colors">
                   <RotateCcw className="w-4 h-4" />
                 </button>
               )}
             </div>
+
+            {result && (
+              <button onClick={handleGenerateQuestions} disabled={isGeneratingQuestions}
+                className="w-full py-3.5 rounded-xl bg-violet-600 text-white text-sm font-black hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-violet-200 active:scale-[0.98] flex items-center justify-center gap-2">
+                {isGeneratingQuestions
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />Generating Questions...</>
+                  : <><MessageSquare className="w-4 h-4" />Generate Interview Questions</>}
+              </button>
+            )}
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 min-h-96">
@@ -191,13 +263,13 @@ export default function AnalysisPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-4">
                   <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
-                  <p className="text-sm font-semibold text-gray-500">Gemini is reading the resume...</p>
+                  <p className="text-sm font-semibold text-gray-500">AI is reading the resume...</p>
                 </div>
                 <Skeleton />
               </div>
             )}
 
-            {result && (
+            {result && !showInterview && (
               <div className="space-y-4 animate-fade-in">
                 <ScoreRing score={result.score} />
                 <div className="rounded-2xl bg-slate-50 border border-gray-100 p-4">
@@ -224,6 +296,28 @@ export default function AnalysisPage() {
                     </div>
                   ))}
                 </div>
+                <div className="p-4 rounded-xl bg-violet-50 border border-violet-100 text-center">
+                  <p className="text-xs text-violet-600 font-semibold">✦ Click "Generate Interview Questions" to get 8 AI-tailored questions based on this candidate</p>
+                </div>
+              </div>
+            )}
+
+            {showInterview && (
+              <div>
+                <button onClick={() => setShowInterview(false)} className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gray-600 mb-4 transition-colors">
+                  ← Back to Analysis
+                </button>
+                {isGeneratingQuestions ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Loader2 className="w-4 h-4 text-violet-500 animate-spin" />
+                      <p className="text-sm font-semibold text-gray-500">Generating tailored interview questions...</p>
+                    </div>
+                    {[1,2,3,4].map(i => <div key={i} className="h-24 rounded-xl skeleton" />)}
+                  </div>
+                ) : interviewResult ? (
+                  <InterviewPanel questions={interviewResult.questions} />
+                ) : null}
               </div>
             )}
           </div>
